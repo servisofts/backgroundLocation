@@ -39,7 +39,7 @@ public class BackgroundLocation {
         JSONObject data = obj.getJSONObject("data");
 
         try {
-            JSONObject location = SPGConect.ejecutarConsultaObject("select get_by('background_location','key_usuario','"
+            JSONObject location = SPGConect.ejecutarConsultaObject("select get_by_key('background_location','key_usuario','"
                     + obj.getString("key_usuario") + "') as json");
             if (!location.has("key")) {
                 SConsole.log("No hay location");
