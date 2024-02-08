@@ -6,6 +6,7 @@ import Server.SSSAbstract.SSSessionAbstract;
 import Servisofts.SConsole;
 import Servisofts.SPGConect;
 import Servisofts.SUtil;
+import util.GPJSON;
 import util.GPX;
 
 public class BackgroundLocation {
@@ -37,12 +38,10 @@ public class BackgroundLocation {
     public static void onChange(JSONObject obj, SSSessionAbstract session) {
         // SConsole.log(obj.toString());
         JSONObject data = obj.getJSONObject("data");
-
         try {
-            JSONObject location = SPGConect.ejecutarConsultaObject("select get_by_key('background_location','key_usuario','"
+            JSONObject location = SPGConect.ejecutarConsultaObject("select get_by('background_location','key_usuario','"
                     + obj.getString("key_usuario") + "') as json");
             if (!location.has("key")) {
-                SConsole.log("No hay location");
                 location.put("key", SUtil.uuid());
                 location.put("fecha_on", SUtil.now());
                 location.put("fecha_last", SUtil.now());
@@ -57,11 +56,13 @@ public class BackgroundLocation {
                 location.put("fecha_last", SUtil.now());
                 SPGConect.editObject("background_location", location);
             }
+            GPJSON.saveGPJSON(obj.getString("key_usuario"), data);
             GPX.saveGPX(obj.getString("key_usuario"), data.getDouble("latitude"), data.getDouble("longitude"),
                     data.getDouble("rotation"));
             obj.put("estado", "exito");
 
         } catch (Exception e) {
+            obj.put("estado", "error");
             e.printStackTrace();
         }
     }
